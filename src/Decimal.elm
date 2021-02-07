@@ -12,11 +12,15 @@ decimal : Int -> Int -> Decimal
 decimal mantissa exponent =
     { mantissa = mantissa, exponent = exponent }
 
+
 normalize : Decimal -> Decimal
 normalize { mantissa, exponent } =
     if modBy 10 mantissa == 0 then
         normalize { mantissa = mantissa // 10, exponent = exponent + 1 }
-        else { mantissa = mantissa, exponent = exponent }
+
+    else
+        { mantissa = mantissa, exponent = exponent }
+
 
 widen : Int -> Decimal -> Decimal
 widen e a =
@@ -56,16 +60,17 @@ sub a1 a2 =
     in
     { mantissa = b1.mantissa - b2.mantissa, exponent = minExp }
 
+
+
 -- 100 * 0.1 = 10
 -- (1, 2) * (1, -1) = (1, 1)
--- 20 * 0.5 = 
+-- 20 * 0.5 =
 -- (2, 1) * (5, -1) = (1, 1)
 
 
 mul : Decimal -> Decimal -> Decimal
 mul a1 a2 =
     normalize { mantissa = a1.mantissa * a2.mantissa, exponent = a1.exponent + a2.exponent }
-
 
 
 cmpHelp : (Int -> Int -> a) -> Decimal -> Decimal -> a
@@ -95,6 +100,16 @@ lt a b =
 gt : Decimal -> Decimal -> Bool
 gt a b =
     cmpHelp (>) a b
+
+
+eq : Decimal -> Decimal -> Bool
+eq a b =
+    cmpHelp (==) a b
+
+
+neq : Decimal -> Decimal -> Bool
+neq a b =
+    cmpHelp (/=) a b
 
 
 digits : Parser ()
@@ -179,6 +194,21 @@ fromString : String -> Maybe Decimal
 fromString s =
     Parser.run decimalParser s |> Result.toMaybe
 
+
 toString : Decimal -> String
 toString d =
     String.fromInt d.mantissa ++ "E" ++ String.fromInt d.exponent
+
+
+fromInt : Int -> Decimal
+fromInt n =
+    normalize { mantissa = n, exponent = 0 }
+
+
+
+-- May involve loss of precision
+
+
+toFloat : Decimal -> Float
+toFloat d =
+    toString d |> String.toFloat |> Maybe.withDefault (0.0 / 0.0)

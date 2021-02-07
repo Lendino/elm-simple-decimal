@@ -93,6 +93,20 @@ mulTest =
         ]
 
 
+cmpTest : Test
+cmpTest =
+    describe "Test of comparisons"
+        [ test "1 > 0" <|
+            \_ -> Expect.true "1 > 0" (D.gt (decimal 1 0) (decimal 0 0))
+        , test "123 > 122.9" <|
+            \_ -> Expect.true "123 > 122.9" (D.gt (decimal 123 0) (decimal 1229 -1))
+        , test "-1 < 1" <|
+            \_ -> Expect.true "-1 < 1" (D.lt (decimal -1 0) (decimal 1 0))
+        , test "123 = 123.0" <|
+            \_ -> Expect.true "123 = 123.0" (D.eq (decimal 123 0) (decimal 1230 -1))
+        ]
+
+
 fromString : Test
 fromString =
     describe "fromString o toString = id"

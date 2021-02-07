@@ -1,0 +1,19 @@
+{
+    "type": "package",
+    "name": "Lendino/simple-decimal",
+    "summary": "A simple fixed point decimal type",
+    "license": "BSD-3-Clause",
+    "version": "0.0.1",
+    "exposed-modules": [
+        "Data.Fixed"
+    ],
+    "elm-version": "0.19.0 <= v < 0.20.0",
+    "dependencies": {
+        "elm/core": "1.0.0 <= v < 2.0.0",
+        "elm/parser": "1.1.0 <= v < 2.0.0",
+        "elm-community/list-extra": "8.2.4 <= v < 9.0.0"
+    },
+    "test-dependencies": {
+        "elm-explorations/test": "1.2.2 <= v < 2.0.0"
+    }
+}

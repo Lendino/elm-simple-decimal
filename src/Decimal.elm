@@ -166,8 +166,8 @@ exponentPart =
         ]
 
 
-doStuff : String -> String -> String -> Decimal
-doStuff int frac exp =
+buildDecimal : String -> String -> String -> Decimal
+buildDecimal int frac exp =
     let
         -- drop the comma and trailing zeros
         frac_ =
@@ -185,9 +185,13 @@ doStuff int frac exp =
     { mantissa = mantissa, exponent = exp_ - String.length frac_ }
 
 
+
+-- Parses decimal numbers as defined in the GraphQL spec.
+
+
 decimalParser : Parser Decimal
 decimalParser =
-    succeed doStuff |= integerPart |= fractionalPart |= exponentPart |. end
+    succeed buildDecimal |= integerPart |= fractionalPart |= exponentPart |. end
 
 
 fromString : String -> Maybe Decimal

@@ -10,12 +10,20 @@ type alias Decimal =
 
 decimal : Int -> Int -> Decimal
 decimal mantissa exponent =
-    { mantissa = mantissa, exponent = exponent }
+    normalize { mantissa = mantissa, exponent = exponent }
+
+
+
+-- This will not work if mantissa > 2^31 - 1
+-- because of JS. A better solution is needed
 
 
 normalize : Decimal -> Decimal
 normalize { mantissa, exponent } =
-    if modBy 10 mantissa == 0 then
+    if mantissa == 0 then
+        { mantissa = 0, exponent = 0 }
+
+    else if modBy 10 mantissa == 0 then
         normalize { mantissa = mantissa // 10, exponent = exponent + 1 }
 
     else
@@ -24,7 +32,11 @@ normalize { mantissa, exponent } =
 
 widen : Int -> Decimal -> Decimal
 widen e a =
-    { mantissa = a.mantissa * (10 ^ (a.exponent - e)), exponent = e }
+    let
+        power =
+            10 ^ (a.exponent - e)
+    in
+    { mantissa = a.mantissa * power, exponent = e }
 
 
 normalizeMin : Decimal -> Decimal -> ( Int, Decimal, Decimal )
@@ -49,7 +61,7 @@ add a1 a2 =
         ( minExp, b1, b2 ) =
             normalizeMin a1 a2
     in
-    { mantissa = b1.mantissa + b2.mantissa, exponent = minExp }
+    normalize { mantissa = b1.mantissa + b2.mantissa, exponent = minExp }
 
 
 sub : Decimal -> Decimal -> Decimal
@@ -58,7 +70,7 @@ sub a1 a2 =
         ( minExp, b1, b2 ) =
             normalizeMin a1 a2
     in
-    { mantissa = b1.mantissa - b2.mantissa, exponent = minExp }
+    normalize { mantissa = b1.mantissa - b2.mantissa, exponent = minExp }
 
 
 
@@ -66,6 +78,7 @@ sub a1 a2 =
 -- (1, 2) * (1, -1) = (1, 1)
 -- 20 * 0.5 =
 -- (2, 1) * (5, -1) = (1, 1)
+-- Mul will not handle overflow of the mantissa. Solution to be determined.
 
 
 mul : Decimal -> Decimal -> Decimal
@@ -182,7 +195,7 @@ buildDecimal int frac exp =
         mantissa =
             (int ++ frac_) |> String.toInt |> Maybe.withDefault 0
     in
-    { mantissa = mantissa, exponent = exp_ - String.length frac_ }
+    normalize { mantissa = mantissa, exponent = exp_ - String.length frac_ }
 
 
 
